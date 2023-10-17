@@ -21,6 +21,20 @@ public class Menu {
         return this.getIntInput();
     }
 
+    public int displayCancelBookingMenu() {
+        System.out.println("Cancel Booking");
+        System.out.println("What is the ID of the booking you want to cancel?");
+        String bookingId = scan.nextLine();
+        System.out.printf("Are you sure you want to cancel booking - %s? (Y/N)%n", bookingId);
+        char choice = scan.nextLine().charAt(0);
+
+        if (choice == 'N') {
+            return 0;
+        }
+
+        return Integer.parseInt(bookingId);
+    }
+
     public int displayViewRoomsMenu() {
         System.out.println("View Rooms");
         System.out.println("1. View All Rooms");

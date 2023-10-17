@@ -44,6 +44,10 @@ public class User {
         this.fees += fee;
     }
 
+    public void decreaseSum(double sum) {
+        this.sum -= sum;
+    }
+
     public void addBooking(Booking booking) {
         this.bookings.add(booking);
     }

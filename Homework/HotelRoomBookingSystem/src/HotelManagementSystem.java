@@ -58,11 +58,11 @@ public class HotelManagementSystem {
                         if (roomToBook != null) {
                             Booking booking = new Booking(roomToBook.getRoomNumber(), currentUser, start, end);
                             currentUser.addBooking(booking);
-                            currentUser.increaseSum(roomToBook.getPricePerNight());
-                            long diffDays = (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24);
+                            long diffDays = daysDifference(start, end);
+                            currentUser.increaseSum(diffDays * roomToBook.getPricePerNight());
                             this.totalIncome += diffDays * roomToBook.getPricePerNight();
                             this.bookings.add(booking);
-                            this.rooms = changeStatusToBooked(this.rooms, roomToBook);
+                            this.rooms = changeStatusTo(this.rooms, roomToBook, "booked");
                         } else {
                             System.out.println("The chosen room is not available for this period");
                         }
@@ -74,7 +74,6 @@ public class HotelManagementSystem {
                                 User checker = containsUser(users, credentials21[0], credentials21[1]);
                                 if (containsUser(users, credentials21[0], credentials21[1]) != null) {
                                     currentUser = checker;
-                                    currentUser.viewProfile();
                                 } else {
                                     System.out.println("A user with this name is not registered");
                                     currentUser = null;
@@ -85,7 +84,6 @@ public class HotelManagementSystem {
                                 if (containsUser(users, credentials22[0], credentials22[1]) == null) {
                                     currentUser = new User(credentials22[0], credentials22[1]);
                                     users.add(currentUser);
-                                    currentUser.viewProfile();
                                 } else {
                                     System.out.println("A user with this name is already registered");
                                     currentUser = null;
@@ -106,6 +104,95 @@ public class HotelManagementSystem {
                     }
                     break;
                 case 3:
+                    if (currentUser != null) {
+                        int ch3 = menu.displayCancelBookingMenu();
+                        if (ch3 != 0) {
+                            if (!bookings.isEmpty()) {
+                                boolean bookingExists = false;
+                                User bookingUser = null;
+                                String numberOfCancelledRoom = null;
+                                Date start = new Date();
+                                Date end = new Date();
+                                for (int i = 0; i < bookings.size(); i++) {
+                                    if (bookings.get(i).getBookingID() == ch3) {
+                                        bookingExists = true;
+                                        start = bookings.get(i).getCheckIn();
+                                        end = bookings.get(i).getCheckOut();
+                                        bookingUser = bookings.get(i).getUser();
+                                        numberOfCancelledRoom = bookings.get(i).getRoomNumber();
+                                        bookings.remove(i);
+                                        break;
+                                    }
+                                }
+
+                                if (bookingExists && bookingUser != null) {
+                                    double userCancellationFee = 0.0;
+                                    long diffDays = daysDifference(start, end);
+                                    double roomPricePerNight = 0.0;
+                                    for (int i = 0; i < rooms.size(); i++) {
+                                        if (rooms.get(i).getRoomNumber().equals(numberOfCancelledRoom)) {
+                                            userCancellationFee = rooms.get(i).getCancellationFee();
+                                            roomPricePerNight = rooms.get(i).getPricePerNight();
+                                            this.rooms = changeStatusTo(rooms, rooms.get(i), "available");
+                                            break;
+                                        }
+                                    }
+                                    for (int i = 0; i < users.size(); i++) {
+                                        if (users.get(i).getUsername().equals(bookingUser.getUsername())) {
+                                            for (int j = 0; j < users.get(i).getBookings().size(); j++) {
+                                                if (users.get(i).getBookings().get(j).getBookingID() == ch3) {
+                                                    users.get(i).getBookings().remove(j);
+                                                    users.get(i).increaseFees(userCancellationFee);
+                                                    users.get(i).decreaseSum(diffDays * roomPricePerNight);
+                                                    this.totalIncome -= diffDays * roomPricePerNight;
+                                                    break;
+                                                }
+                                            }
+                                            break;
+                                        }
+                                    }
+
+                                    this.totalCancellationFees += userCancellationFee;
+                                }
+                            }
+                        }
+                    } else {
+                        int ch3 = menu.displayEntranceMenu();
+                        switch (ch3) {
+                            case 1:
+                                String[] credentials31 = menu.displayLoginMenu();
+                                User checker = containsUser(users, credentials31[0], credentials31[1]);
+                                if (containsUser(users, credentials31[0], credentials31[1]) != null) {
+                                    currentUser = checker;
+                                } else {
+                                    System.out.println("A user with this name is not registered");
+                                    currentUser = null;
+                                }
+                                continue;
+                            case 2:
+                                String[] credentials32 = menu.displayRegistrationMenu();
+                                if (containsUser(users, credentials32[0], credentials32[1]) == null) {
+                                    currentUser = new User(credentials32[0], credentials32[1]);
+                                    users.add(currentUser);
+                                } else {
+                                    System.out.println("A user with this name is already registered");
+                                    currentUser = null;
+                                }
+                                continue;
+                            case 3: // TO DO
+                                int ch31 = menu.displayAdminMenu();
+                                switch (ch31) {
+                                    case 1:
+                                    case 2:
+                                    case 3:
+                                    case 4:
+                                }
+                                continue;
+                            case 4:
+                                continue;
+                        }
+                    }
+                    break;
                 case 4:
                     if (currentUser == null) {
                         int ch4 = menu.displayEntranceMenu();
@@ -223,17 +310,21 @@ public class HotelManagementSystem {
         return false;
     }
 
-    public static List<Room> changeStatusToBooked(List<Room> rooms, Room room) {
-        List<Room> updatedRooms = new ArrayList<>();
+    public static List<Room> changeStatusTo(List<Room> rooms, Room room, String status) {
+        List<Room> updatedRooms;
 
         for (int i = 0; i < rooms.size(); i++) {
             if (rooms.get(i).getRoomNumber().equals(room.getRoomNumber())) {
-                rooms.get(i).setStatus("booked");
+                rooms.get(i).setStatus(status);
             }
         }
 
         updatedRooms = rooms;
 
         return updatedRooms;
+    }
+
+    public static long daysDifference(Date start, Date end) {
+        return ((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
     }
 }
