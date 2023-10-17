@@ -1,0 +1,22 @@
+[
+  {
+    "type": "Deluxe",
+    "amenities": ["Free Wi-Fi", "Mini Bar", "Flat-screen TV"],
+    "maximumOccupancy": 2
+  },
+  {
+    "type": "Suite",
+    "amenities": ["Balcony with View", "Whirlpool Tub", "Kitchenette"],
+    "maximumOccupancy": 4
+  },
+  {
+    "type": "Single",
+    "amenities": ["Single Bed", "Desk", "Private Bathroom"],
+    "maximumOccupancy": 1
+  },
+  {
+    "type": "Double",
+    "amenities": ["Two Double Beds", "Work Area", "Private Bathroom"],
+    "maximumOccupancy": 2
+  }
+]
