@@ -1,9 +1,9 @@
 import java.util.List;
 
 public class RoomType {
-    private String type;
-    private List<String> amenities;
-    private int maximumOccupancy;
+    private final String type;
+    private final List<String> amenities;
+    private final int maximumOccupancy;
 
     public RoomType(String type, int maximumOccupancy, List<String> amenities) {
         this.type = type;
@@ -23,22 +23,10 @@ public class RoomType {
         return this.maximumOccupancy;
     }
 
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public void setAmenities(List<String> amenities) {
-        this.amenities = amenities;
-    }
-
-    public void setMaximumOccupancy(int maximumOccupancy) {
-        this.maximumOccupancy = maximumOccupancy;
-    }
-
     @Override
     public String toString() {
-        return  type + " room - " +
-                "Amenities: " + amenities +
-                ", MaximumOccupancy=" + maximumOccupancy;
+        return  "Type: " + this.getType() + " room\n" +
+                "Amenities: " + getAmenities() +
+                ", \nMaximumOccupancy: " + getMaximumOccupancy();
     }
 }

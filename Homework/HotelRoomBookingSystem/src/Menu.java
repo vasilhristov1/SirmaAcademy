@@ -38,7 +38,8 @@ public class Menu {
         System.out.println("View Rooms");
         System.out.println("1. View All Rooms");
         System.out.println("2. View Available Rooms");
-        System.out.println("3. Back to Main Menu");
+        System.out.println("3. View Room Types");
+        System.out.println("4. Back to Main Menu");
         System.out.print("Enter your choice: ");
         return this.getIntInput();
     }
@@ -138,18 +139,33 @@ public class Menu {
         return this.getIntInput();
     }
 
-    public String[] displayAddRoomMenu() {
+    public String[] displayAddRoomMenu(List<RoomType> roomTypeList) {
+        InputValidator validator = new InputValidator();
         System.out.println("Add Room");
         System.out.print("Enter room number: ");
         String roomNumber = scan.nextLine();
+        while (!validator.isValidRoomNumber(roomNumber)) {
+            System.out.print("Enter a valid room number: ");
+            roomNumber = scan.nextLine();
+        }
+
         System.out.print("Enter room type: ");
         String roomType = scan.nextLine();
+        while (!validator.isValidType(roomTypeList, roomType)) {
+            System.out.print("Enter a valid room type: ");
+            roomType = scan.nextLine();
+        }
+
         System.out.print("Enter price per night: ");
         String roomPrice = scan.nextLine();
         System.out.print("Enter cancellation fee: ");
         String roomFee = scan.nextLine();
         System.out.print("Enter status: ");
         String roomStatus = scan.nextLine();
+        while (!validator.isValidStatus(roomStatus)) {
+            System.out.print("Enter a valid room status: ");
+            roomStatus = scan.nextLine();
+        }
 
         String[] tokens = new String[5];
         tokens[0] = roomNumber;
@@ -162,9 +178,14 @@ public class Menu {
     }
 
     public String displayRemoveRoomMenu() {
+        InputValidator validator = new InputValidator();
         System.out.println("Remove Room");
         System.out.print("Enter room number to be removed: ");
         String roomNumber = scan.nextLine();
+        while (!validator.isValidRoomNumber(roomNumber)) {
+            System.out.print("Enter a valid room number to be removed: ");
+            roomNumber = scan.nextLine();
+        }
 
         return roomNumber;
     }
@@ -188,8 +209,10 @@ public class Menu {
 
     public void displayRoomTypes(List<RoomType> roomTypes) {
         System.out.println("Room Types:");
+        int i = 1;
         for (RoomType roomType : roomTypes) {
-            System.out.println(roomType);
+            System.out.println(i + ". " + roomType);
+            i++;
         }
     }
 

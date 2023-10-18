@@ -26,9 +26,12 @@ public class HotelManagementSystem {
 
         do {
             int choice = menu.displayMainMenu();
+            printDiv();
             switch (choice) {
                 case 1:
+                    // printDiv();
                     int ch1 = menu.displayViewRoomsMenu();
+                    printDiv();
                     switch (ch1) {
                         case 1:
                             menu.displayAllRooms(this.rooms);
@@ -37,21 +40,47 @@ public class HotelManagementSystem {
                             menu.displayAvailableRooms(this.rooms);
                             break;
                         case 3:
+                            menu.displayRoomTypes(this.roomTypes);
+                            break;
+                        case 4:
                             continue;
                     }
                     break;
                 case 2:
+                    // printDiv();
                     if (currentUser != null) {
+                        InputValidator validator = new InputValidator();
                         String[] bookingValues = menu.displayBookingMenu();
                         String roomNumber = bookingValues[0];
+                        if (!validator.isValidRoomNumber(roomNumber) && !checkRoomExistence(this.rooms, roomNumber)) {
+                            System.out.println("The room number is not valid or there is no such a room!");
+                            continue;
+                        }
+
                         String[] checkIn = bookingValues[1].split("-");
                         String[] checkOut = bookingValues[2].split("-");
+
                         int yearIn = Integer.parseInt(checkIn[0]);
                         int monthIn = Integer.parseInt(checkIn[1]);
                         int dayIn = Integer.parseInt(checkIn[2]);
+                        if (!dateCheck(yearIn, monthIn, dayIn)) {
+                            System.out.println("The check in date is not valid!");
+                            continue;
+                        }
+
                         int yearOut = Integer.parseInt(checkOut[0]);
                         int monthOut = Integer.parseInt(checkOut[1]);
                         int dayOut = Integer.parseInt(checkOut[2]);
+                        if (!dateCheck(yearOut, monthOut, dayOut)) {
+                            System.out.println("The check out date is not valid!");
+                            continue;
+                        }
+
+                        if (!periodCheck(yearIn, yearOut, monthIn, monthOut, dayIn, dayOut)) {
+                            System.out.println("The chosen period is not valid!");
+                            continue;
+                        }
+
                         Date start = new Date(yearIn, monthIn - 1, dayIn);
                         Date end = new Date(yearOut, monthOut - 1, dayOut);
 
@@ -66,19 +95,21 @@ public class HotelManagementSystem {
                             this.bookings.add(booking);
                             this.rooms = changeStatusTo(this.rooms, roomToBook, "booked");
                             writeModifiedRooms(this.rooms);
+                            System.out.printf("Room number %s is successfully booked!%n", roomNumber);
                         } else {
                             System.out.println("The chosen room is not available!");
                         }
                     } else {
                         int ch2 = menu.displayEntranceMenu();
+                        printDiv();
                         switch (ch2) {
                             case 1:
                                 String[] credentials21 = menu.displayLoginMenu();
                                 User checker = containsUser(users, credentials21[0], credentials21[1]);
-                                if (containsUser(users, credentials21[0], credentials21[1]) != null) {
+                                if (checker != null) {
                                     currentUser = checker;
                                 } else {
-                                    System.out.println("A user with this name is not registered");
+                                    System.out.println("A user with this name is not registered or the password is not correct!");
                                     currentUser = null;
                                 }
                                 continue;
@@ -88,13 +119,14 @@ public class HotelManagementSystem {
                                     currentUser = new User(credentials22[0], credentials22[1]);
                                     users.add(currentUser);
                                 } else {
-                                    System.out.println("A user with this name is already registered");
+                                    System.out.println("A user with this name is already registered!");
                                     currentUser = null;
                                 }
                                 continue;
                             case 3:
                                 int ch31 = menu.displayAdminMenu();
-                                adminOperations(ch31, this.menu, this.bookings, this.users, this.rooms, this.totalIncome, this.totalCancellationFees);
+                                printDiv();
+                                adminOperations(ch31, this.menu, this.bookings, this.rooms, this.totalIncome, this.totalCancellationFees, this.roomTypes);
                                 continue;
                             case 4:
                                 continue;
@@ -102,6 +134,7 @@ public class HotelManagementSystem {
                     }
                     break;
                 case 3:
+                    // printDiv();
                     if (currentUser != null) {
                         int ch3 = menu.displayCancelBookingMenu();
                         if (ch3 != 0) {
@@ -152,11 +185,18 @@ public class HotelManagementSystem {
                                     }
 
                                     this.totalCancellationFees += userCancellationFee;
+
+                                    System.out.printf("Booking %d is successfully cancelled!%n", ch3);
+                                } else {
+                                    System.out.println("There is no booking with the entered ID!");
                                 }
+                            } else {
+                                System.out.println("There is no booking to be cancelled!");
                             }
                         }
                     } else {
                         int ch3 = menu.displayEntranceMenu();
+                        printDiv();
                         switch (ch3) {
                             case 1:
                                 String[] credentials31 = menu.displayLoginMenu();
@@ -164,7 +204,7 @@ public class HotelManagementSystem {
                                 if (containsUser(users, credentials31[0], credentials31[1]) != null) {
                                     currentUser = checker;
                                 } else {
-                                    System.out.println("A user with this name is not registered");
+                                    System.out.println("A user with this name is not registered or the password is not correct!");
                                     currentUser = null;
                                 }
                                 continue;
@@ -174,13 +214,14 @@ public class HotelManagementSystem {
                                     currentUser = new User(credentials32[0], credentials32[1]);
                                     users.add(currentUser);
                                 } else {
-                                    System.out.println("A user with this name is already registered");
+                                    System.out.println("A user with this name is already registered!");
                                     currentUser = null;
                                 }
                                 continue;
                             case 3:
                                 int ch31 = menu.displayAdminMenu();
-                                adminOperations(ch31, this.menu, this.bookings, this.users, this.rooms, this.totalIncome, this.totalCancellationFees);
+                                printDiv();
+                                adminOperations(ch31, this.menu, this.bookings, this.rooms, this.totalIncome, this.totalCancellationFees, this.roomTypes);
                                 continue;
                             case 4:
                                 continue;
@@ -188,8 +229,10 @@ public class HotelManagementSystem {
                     }
                     break;
                 case 4:
+                    // printDiv();
                     if (currentUser == null) {
                         int ch4 = menu.displayEntranceMenu();
+                        printDiv();
                         switch (ch4) {
                             case 1:
                                 String[] credentials1 = menu.displayLoginMenu();
@@ -199,7 +242,7 @@ public class HotelManagementSystem {
                                     currentUser = checker;
                                     currentUser.viewProfile();
                                 } else {
-                                    System.out.println("A user with this name is not registered");
+                                    System.out.println("A user with this name is not registered or the password is not correct!");
                                     currentUser = null;
                                 }
                                 continue;
@@ -210,13 +253,14 @@ public class HotelManagementSystem {
                                     users.add(currentUser);
                                     currentUser.viewProfile();
                                 } else {
-                                    System.out.println("A user with this name is already registered");
+                                    System.out.println("A user with this name is already registered!");
                                     currentUser = null;
                                 }
                                 continue;
                             case 3:
                                 int ch31 = menu.displayAdminMenu();
-                                adminOperations(ch31, this.menu, this.bookings, this.users, this.rooms, this.totalIncome, this.totalCancellationFees);
+                                printDiv();
+                                adminOperations(ch31, this.menu, this.bookings, this.rooms, this.totalIncome, this.totalCancellationFees, this.roomTypes);
                                 continue;
                             case 4:
                                 continue;
@@ -226,13 +270,20 @@ public class HotelManagementSystem {
                     }
                     break;
                 case 5:
+                    // printDiv();
                     if (currentUser != null) {
                         currentUser = null;
                     } else {
-                        System.out.println("You are not logged in the system");
+                        System.out.println("You are not logged in the system!");
                     }
                     break;
                 case 6:
+                    // printDiv();
+                    if (currentUser != null) {
+                        System.out.printf("Bye, %s!%n", currentUser.getUsername());
+                    } else {
+                        System.out.println("Goodbye!");
+                    }
                     menu.close();
                     return;
             }
@@ -326,14 +377,89 @@ public class HotelManagementSystem {
         }
     }
 
-    public static void adminOperations(int choice, Menu men, List<Booking> books, List<User> usrs, List<Room> rms, double ti, double tcf) {
+    public static void printDiv() {
+        System.out.println();
+        String line = "";
+        for (int i = 0; i < 60; i++) {
+            line += "-";
+        }
+        System.out.println(line);
+        System.out.println();
+    }
+
+    public static boolean checkRoomExistence(List<Room> rms, String rmNum) {
+        if (!rms.isEmpty()) {
+            for (int i = 0; i < rms.size(); i++) {
+                if (rms.get(i).getRoomNumber().equals(rmNum)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public static boolean periodCheck(int y1, int y2, int m1, int m2, int d1, int d2) {
+        if (y2 < y1) {
+            return false;
+        } else if (y1 == y2) {
+            if (m2 < m1) {
+                return false;
+            } else if (m1 == m2) {
+                return d2 >= d1;
+            } else {
+                return true;
+            }
+        } else {
+            return true;
+        }
+    }
+
+    public static boolean dateCheck(int year, int month, int day) {
+        if (month < 1 || month > 12) {
+            return false;
+        }
+
+        switch (month) {
+            case 1:
+            case 3:
+            case 5:
+            case 7:
+            case 8:
+            case 10:
+            case 12:
+                if (day > 31 || day < 1) {
+                    return false;
+                }
+                break;
+            case 2:
+                if (day > 28 || day < 1) {
+                    return false;
+                }
+                break;
+            case 4:
+            case 6:
+            case 9:
+            case 11:
+                if (day > 30 || day < 1) {
+                    return false;
+                }
+                break;
+        }
+
+        return true;
+    }
+
+    public static void adminOperations(int choice, Menu men, List<Booking> books, List<Room> rms, double ti, double tcf, List<RoomType> roomTypeList) {
         switch (choice) {
             case 1:
                 if (books.isEmpty()) {
                     System.out.println("There are no bookings registered yet.");
                 } else {
+                    int i = 1;
                     for (Booking book : books) {
-                        System.out.println(book);
+                        System.out.println(i + ". " + book);
+                        i++;
                     }
                 }
                 break;
@@ -344,35 +470,41 @@ public class HotelManagementSystem {
                 System.out.printf("Total: %.2f%n", (ti + tcf));
                 break;
             case 3:
-                String[] roomDetails = men.displayAddRoomMenu();
+                String[] roomDetails = men.displayAddRoomMenu(roomTypeList);
                 Room newRoom = new Room(roomDetails[0], roomDetails[1], Double.parseDouble(roomDetails[2]), Double.parseDouble(roomDetails[3]), roomDetails[4]);
                 String yesOrNo = men.getUserInput("Do you want to add this room? (Y/N)");
 
                 if (yesOrNo.equals("Y")) {
                     rms.add(newRoom);
                     writeModifiedRooms(rms);
+                    System.out.println("A new room is successfully added!");
                 }
 
                 break;
             case 4:
                 String roomRemove = men.displayRemoveRoomMenu();
-                String yn = men.getUserInput("Do you want to remove this room? (Y/N)");
 
-                if (yn.equals("Y")) {
-                    boolean isRoomRemoved = false;
-                    for (int i = 0; i < rms.size(); i++) {
-                        if (rms.get(i).getRoomNumber().equals(roomRemove) && rms.get(i).getStatus().equals("available")) {
-                            rms.remove(i);
-                            writeModifiedRooms(rms);
-                            isRoomRemoved = true;
-                            break;
+                if (checkRoomExistence(rms, roomRemove)) {
+                    String yn = men.getUserInput("Do you want to remove this room? (Y/N)");
+
+                    if (yn.equals("Y")) {
+                        boolean isRoomRemoved = false;
+                        for (int i = 0; i < rms.size(); i++) {
+                            if (rms.get(i).getRoomNumber().equals(roomRemove) && rms.get(i).getStatus().equals("available")) {
+                                rms.remove(i);
+                                writeModifiedRooms(rms);
+                                isRoomRemoved = true;
+                                break;
+                            }
+                        }
+                        if (isRoomRemoved) {
+                            System.out.println("The room is removed successfully!");
+                        } else {
+                            System.out.println("The room cannot be removed!");
                         }
                     }
-                    if (isRoomRemoved) {
-                        System.out.println("The room is removed successfully!");
-                    } else {
-                        System.out.println("The room cannot be removed!");
-                    }
+                } else {
+                    System.out.println("The room doesn't exist in the system!");
                 }
                 break;
             case 5:
@@ -384,14 +516,20 @@ public class HotelManagementSystem {
                         do {
                             boolean isExit = false;
                             String input = men.getUserInput("Enter your choice: ");
-                            switch (Integer.parseInt(input)) {
+                            switch (men.getIntInput()) {
                                 case 1 -> {
                                     String newRoomNum = men.getUserInput("Enter the new number of the room: ");
+                                    while ((new InputValidator()).isValidRoomNumber(newRoomNum)) {
+                                        newRoomNum = men.getUserInput("Invalid input! Enter a valid new number of the room: ");
+                                    }
                                     rm.setRoomNumber(newRoomNum);
                                     writeModifiedRooms(rms);
                                 }
                                 case 2 -> {
                                     String newRoomType = men.getUserInput("Enter the new type of the room: ");
+                                    while ((new InputValidator()).isValidType(roomTypeList, newRoomType)) {
+                                        newRoomType = men.getUserInput("Invalid input! Enter a valid new type of the room: ");
+                                    }
                                     rm.setType(newRoomType);
                                     writeModifiedRooms(rms);
                                 }
@@ -407,6 +545,9 @@ public class HotelManagementSystem {
                                 }
                                 case 5 -> {
                                     String newRoomStatus = men.getUserInput("Enter the new status of the room: ");
+                                    while ((new InputValidator()).isValidStatus(newRoomStatus)) {
+                                        newRoomStatus = men.getUserInput("Invalid input! Enter a valid new status of the room: ");
+                                    }
                                     rm.setStatus(newRoomStatus);
                                     writeModifiedRooms(rms);
                                 }
