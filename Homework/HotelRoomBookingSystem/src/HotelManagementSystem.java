@@ -1,10 +1,12 @@
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonIOException;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -63,8 +65,9 @@ public class HotelManagementSystem {
                             this.totalIncome += diffDays * roomToBook.getPricePerNight();
                             this.bookings.add(booking);
                             this.rooms = changeStatusTo(this.rooms, roomToBook, "booked");
+                            writeModifiedRooms(this.rooms);
                         } else {
-                            System.out.println("The chosen room is not available for this period");
+                            System.out.println("The chosen room is not available!");
                         }
                     } else {
                         int ch2 = menu.displayEntranceMenu();
@@ -89,14 +92,9 @@ public class HotelManagementSystem {
                                     currentUser = null;
                                 }
                                 continue;
-                            case 3: // TO DO
+                            case 3:
                                 int ch31 = menu.displayAdminMenu();
-                                switch (ch31) {
-                                    case 1:
-                                    case 2:
-                                    case 3:
-                                    case 4:
-                                }
+                                adminOperations(ch31, this.menu, this.bookings, this.users, this.rooms, this.totalIncome, this.totalCancellationFees);
                                 continue;
                             case 4:
                                 continue;
@@ -134,16 +132,17 @@ public class HotelManagementSystem {
                                             userCancellationFee = rooms.get(i).getCancellationFee();
                                             roomPricePerNight = rooms.get(i).getPricePerNight();
                                             this.rooms = changeStatusTo(rooms, rooms.get(i), "available");
+                                            writeModifiedRooms(this.rooms);
                                             break;
                                         }
                                     }
-                                    for (int i = 0; i < users.size(); i++) {
-                                        if (users.get(i).getUsername().equals(bookingUser.getUsername())) {
-                                            for (int j = 0; j < users.get(i).getBookings().size(); j++) {
-                                                if (users.get(i).getBookings().get(j).getBookingID() == ch3) {
-                                                    users.get(i).getBookings().remove(j);
-                                                    users.get(i).increaseFees(userCancellationFee);
-                                                    users.get(i).decreaseSum(diffDays * roomPricePerNight);
+                                    for (User user : users) {
+                                        if (user.getUsername().equals(bookingUser.getUsername())) {
+                                            for (int j = 0; j < user.getBookings().size(); j++) {
+                                                if (user.getBookings().get(j).getBookingID() == ch3) {
+                                                    user.getBookings().remove(j);
+                                                    user.increaseFees(userCancellationFee);
+                                                    user.decreaseSum(diffDays * roomPricePerNight);
                                                     this.totalIncome -= diffDays * roomPricePerNight;
                                                     break;
                                                 }
@@ -179,14 +178,9 @@ public class HotelManagementSystem {
                                     currentUser = null;
                                 }
                                 continue;
-                            case 3: // TO DO
+                            case 3:
                                 int ch31 = menu.displayAdminMenu();
-                                switch (ch31) {
-                                    case 1:
-                                    case 2:
-                                    case 3:
-                                    case 4:
-                                }
+                                adminOperations(ch31, this.menu, this.bookings, this.users, this.rooms, this.totalIncome, this.totalCancellationFees);
                                 continue;
                             case 4:
                                 continue;
@@ -220,14 +214,9 @@ public class HotelManagementSystem {
                                     currentUser = null;
                                 }
                                 continue;
-                            case 3: // TO DO
+                            case 3:
                                 int ch31 = menu.displayAdminMenu();
-                                switch (ch31) {
-                                    case 1:
-                                    case 2:
-                                    case 3:
-                                    case 4:
-                                }
+                                adminOperations(ch31, this.menu, this.bookings, this.users, this.rooms, this.totalIncome, this.totalCancellationFees);
                                 continue;
                             case 4:
                                 continue;
@@ -274,9 +263,9 @@ public class HotelManagementSystem {
     }
 
     public static User containsUser(List<User> users, String username, String password) {
-        for (int i = 0; i < users.size(); i++) {
-            if (users.get(i).getUsername().equals(username) && users.get(i).getPassword().equals(password)) {
-                return users.get(i);
+        for (User user : users) {
+            if (user.getUsername().equals(username) && user.getPassword().equals(password)) {
+                return user;
             }
         }
 
@@ -284,8 +273,7 @@ public class HotelManagementSystem {
     }
 
     public static Room checkAvailability(List<Room> rooms, String roomNumber, Date start, Date end, List<Booking> bookingsList) {
-        for (int i = 0; i < rooms.size(); i++) {
-            Room room = rooms.get(i);
+        for (Room room : rooms) {
             if (room.getStatus().equals("available") && room.getRoomNumber().equals(roomNumber) && !checkIfBooked(bookingsList, roomNumber, start, end)) {
                 return room;
             }
@@ -296,8 +284,7 @@ public class HotelManagementSystem {
 
     public static boolean checkIfBooked(List<Booking> bookings, String roomNumber, Date start, Date end) {
         if (!bookings.isEmpty()) {
-            for (int i = 0; i < bookings.size(); i++) {
-                Booking booking = bookings.get(i);
+            for (Booking booking : bookings) {
                 if (booking.getRoomNumber().equals(roomNumber)) {
                     Date bookingCheckIn = booking.getCheckIn();
                     if (bookingCheckIn.compareTo(end) < 0 && bookingCheckIn.compareTo(start) > 0) {
@@ -313,9 +300,9 @@ public class HotelManagementSystem {
     public static List<Room> changeStatusTo(List<Room> rooms, Room room, String status) {
         List<Room> updatedRooms;
 
-        for (int i = 0; i < rooms.size(); i++) {
-            if (rooms.get(i).getRoomNumber().equals(room.getRoomNumber())) {
-                rooms.get(i).setStatus(status);
+        for (Room value : rooms) {
+            if (value.getRoomNumber().equals(room.getRoomNumber())) {
+                value.setStatus(status);
             }
         }
 
@@ -326,5 +313,119 @@ public class HotelManagementSystem {
 
     public static long daysDifference(Date start, Date end) {
         return ((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+    }
+
+    public static void writeModifiedRooms(List<Room> rooms_) {
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        String filePath = "D:\\Study\\SirmaAcademy\\Homework\\HotelRoomBookingSystem\\src\\files\\rooms_.json";
+
+        try (FileWriter writer = new FileWriter(filePath)) {
+            gson.toJson(rooms_, writer);
+        } catch (JsonIOException | IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void adminOperations(int choice, Menu men, List<Booking> books, List<User> usrs, List<Room> rms, double ti, double tcf) {
+        switch (choice) {
+            case 1:
+                if (books.isEmpty()) {
+                    System.out.println("There are no bookings registered yet.");
+                } else {
+                    for (Booking book : books) {
+                        System.out.println(book);
+                    }
+                }
+                break;
+            case 2:
+                System.out.println("Income Report");
+                System.out.printf("Total income: %.2f%n", ti);
+                System.out.printf("Total cancellation fees: %.2f%n", tcf);
+                System.out.printf("Total: %.2f%n", (ti + tcf));
+                break;
+            case 3:
+                String[] roomDetails = men.displayAddRoomMenu();
+                Room newRoom = new Room(roomDetails[0], roomDetails[1], Double.parseDouble(roomDetails[2]), Double.parseDouble(roomDetails[3]), roomDetails[4]);
+                String yesOrNo = men.getUserInput("Do you want to add this room? (Y/N)");
+
+                if (yesOrNo.equals("Y")) {
+                    rms.add(newRoom);
+                    writeModifiedRooms(rms);
+                }
+
+                break;
+            case 4:
+                String roomRemove = men.displayRemoveRoomMenu();
+                String yn = men.getUserInput("Do you want to remove this room? (Y/N)");
+
+                if (yn.equals("Y")) {
+                    boolean isRoomRemoved = false;
+                    for (int i = 0; i < rms.size(); i++) {
+                        if (rms.get(i).getRoomNumber().equals(roomRemove) && rms.get(i).getStatus().equals("available")) {
+                            rms.remove(i);
+                            writeModifiedRooms(rms);
+                            isRoomRemoved = true;
+                            break;
+                        }
+                    }
+                    if (isRoomRemoved) {
+                        System.out.println("The room is removed successfully!");
+                    } else {
+                        System.out.println("The room cannot be removed!");
+                    }
+                }
+                break;
+            case 5:
+                String modifyValue = men.displayModifyRoomMenu();
+                boolean roomExists = false;
+                for (Room rm : rms) {
+                    if (rm.getRoomNumber().equals(modifyValue) && rm.getStatus().equals("available")) {
+                        roomExists = true;
+                        do {
+                            boolean isExit = false;
+                            String input = men.getUserInput("Enter your choice: ");
+                            switch (Integer.parseInt(input)) {
+                                case 1 -> {
+                                    String newRoomNum = men.getUserInput("Enter the new number of the room: ");
+                                    rm.setRoomNumber(newRoomNum);
+                                    writeModifiedRooms(rms);
+                                }
+                                case 2 -> {
+                                    String newRoomType = men.getUserInput("Enter the new type of the room: ");
+                                    rm.setType(newRoomType);
+                                    writeModifiedRooms(rms);
+                                }
+                                case 3 -> {
+                                    String newRoomPrice = men.getUserInput("Enter the new price of the room: ");
+                                    rm.setPricePerNight(Double.parseDouble(newRoomPrice));
+                                    writeModifiedRooms(rms);
+                                }
+                                case 4 -> {
+                                    String newRoomFee = men.getUserInput("Enter the new cancellation fee of the room: ");
+                                    rm.setCancellationFee(Double.parseDouble(newRoomFee));
+                                    writeModifiedRooms(rms);
+                                }
+                                case 5 -> {
+                                    String newRoomStatus = men.getUserInput("Enter the new status of the room: ");
+                                    rm.setStatus(newRoomStatus);
+                                    writeModifiedRooms(rms);
+                                }
+                                case 6 -> isExit = true;
+                            }
+
+                            if (isExit) {
+                                break;
+                            }
+                        } while (true);
+                        break;
+                    }
+                }
+                if (!roomExists) {
+                    System.out.println("There is not such a room or the room is not available!");
+                }
+                break;
+            case 6:
+                break;
+        }
     }
 }

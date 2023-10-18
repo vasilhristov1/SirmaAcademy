@@ -1,9 +1,8 @@
-import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 
 public class Menu {
-    private Scanner scan;
+    private final Scanner scan;
 
     public Menu() {
         this.scan = new Scanner(System.in);
@@ -48,6 +47,7 @@ public class Menu {
         InputValidator inputValidator = new InputValidator();
         String[] tokens = new String[3];
 
+        System.out.println("Booking Menu");
         System.out.println("Which room would you like to book?");
         String roomNumber = scan.nextLine();
 
@@ -130,10 +130,60 @@ public class Menu {
         System.out.println("Admin Menu");
         System.out.println("1. View All Bookings");
         System.out.println("2. View Income Report");
-        System.out.println("3. Modify Room Details");
-        System.out.println("4. Back to Main Menu");
+        System.out.println("3. Add Room");
+        System.out.println("4. Remove Room");
+        System.out.println("5. Modify Room Details");
+        System.out.println("6. Back to Main Menu");
         System.out.print("Enter your choice: ");
         return this.getIntInput();
+    }
+
+    public String[] displayAddRoomMenu() {
+        System.out.println("Add Room");
+        System.out.print("Enter room number: ");
+        String roomNumber = scan.nextLine();
+        System.out.print("Enter room type: ");
+        String roomType = scan.nextLine();
+        System.out.print("Enter price per night: ");
+        String roomPrice = scan.nextLine();
+        System.out.print("Enter cancellation fee: ");
+        String roomFee = scan.nextLine();
+        System.out.print("Enter status: ");
+        String roomStatus = scan.nextLine();
+
+        String[] tokens = new String[5];
+        tokens[0] = roomNumber;
+        tokens[1] = roomType;
+        tokens[2] = roomPrice;
+        tokens[3] = roomFee;
+        tokens[4] = roomStatus;
+
+        return tokens;
+    }
+
+    public String displayRemoveRoomMenu() {
+        System.out.println("Remove Room");
+        System.out.print("Enter room number to be removed: ");
+        String roomNumber = scan.nextLine();
+
+        return roomNumber;
+    }
+
+    public String displayModifyRoomMenu() {
+        System.out.println("Modify Room");
+        System.out.println("Which room you want to modify?");
+        String roomNumber = scan.nextLine();
+        System.out.println("Choose what information you want to change: ");
+        System.out.println("1. Room Number");
+        System.out.println("2. Room Type");
+        System.out.println("3. Room Price per Night");
+        System.out.println("4. Room Cancellation Fee");
+        System.out.println("5. Room Status");
+        System.out.println("6. Back to main menu");
+
+        String token = roomNumber;
+
+        return token;
     }
 
     public void displayRoomTypes(List<RoomType> roomTypes) {
@@ -168,7 +218,7 @@ public class Menu {
     }
 
     public String getUserInput(String prompt) {
-        System.out.print(prompt);
+        System.out.println(prompt);
         return scan.nextLine();
     }
 
