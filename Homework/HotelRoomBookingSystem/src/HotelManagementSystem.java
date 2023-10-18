@@ -26,12 +26,10 @@ public class HotelManagementSystem {
 
         do {
             int choice = menu.displayMainMenu();
-            printDiv();
             switch (choice) {
                 case 1:
-                    // printDiv();
-                    int ch1 = menu.displayViewRoomsMenu();
                     printDiv();
+                    int ch1 = menu.displayViewRoomsMenu();
                     switch (ch1) {
                         case 1:
                             menu.displayAllRooms(this.rooms);
@@ -43,17 +41,20 @@ public class HotelManagementSystem {
                             menu.displayRoomTypes(this.roomTypes);
                             break;
                         case 4:
+                            printDiv();
                             continue;
                     }
+                    printDiv();
                     break;
                 case 2:
-                    // printDiv();
+                    printDiv();
                     if (currentUser != null) {
                         InputValidator validator = new InputValidator();
                         String[] bookingValues = menu.displayBookingMenu();
                         String roomNumber = bookingValues[0];
                         if (!validator.isValidRoomNumber(roomNumber) && !checkRoomExistence(this.rooms, roomNumber)) {
                             System.out.println("The room number is not valid or there is no such a room!");
+                            printDiv();
                             continue;
                         }
 
@@ -63,21 +64,24 @@ public class HotelManagementSystem {
                         int yearIn = Integer.parseInt(checkIn[0]);
                         int monthIn = Integer.parseInt(checkIn[1]);
                         int dayIn = Integer.parseInt(checkIn[2]);
-                        if (!dateCheck(yearIn, monthIn, dayIn)) {
+                        if (!dateCheck(monthIn, dayIn)) {
                             System.out.println("The check in date is not valid!");
+                            printDiv();
                             continue;
                         }
 
                         int yearOut = Integer.parseInt(checkOut[0]);
                         int monthOut = Integer.parseInt(checkOut[1]);
                         int dayOut = Integer.parseInt(checkOut[2]);
-                        if (!dateCheck(yearOut, monthOut, dayOut)) {
+                        if (!dateCheck(monthOut, dayOut)) {
                             System.out.println("The check out date is not valid!");
+                            printDiv();
                             continue;
                         }
 
                         if (!periodCheck(yearIn, yearOut, monthIn, monthOut, dayIn, dayOut)) {
                             System.out.println("The chosen period is not valid!");
+                            printDiv();
                             continue;
                         }
 
@@ -112,6 +116,7 @@ public class HotelManagementSystem {
                                     System.out.println("A user with this name is not registered or the password is not correct!");
                                     currentUser = null;
                                 }
+                                printDiv();
                                 continue;
                             case 2:
                                 String[] credentials22 = menu.displayRegistrationMenu();
@@ -122,19 +127,21 @@ public class HotelManagementSystem {
                                     System.out.println("A user with this name is already registered!");
                                     currentUser = null;
                                 }
+                                printDiv();
                                 continue;
                             case 3:
                                 int ch31 = menu.displayAdminMenu();
-                                printDiv();
                                 adminOperations(ch31, this.menu, this.bookings, this.rooms, this.totalIncome, this.totalCancellationFees, this.roomTypes);
+                                printDiv();
                                 continue;
                             case 4:
                                 continue;
                         }
                     }
+                    printDiv();
                     break;
                 case 3:
-                    // printDiv();
+                    printDiv();
                     if (currentUser != null) {
                         int ch3 = menu.displayCancelBookingMenu();
                         if (ch3 != 0) {
@@ -207,6 +214,7 @@ public class HotelManagementSystem {
                                     System.out.println("A user with this name is not registered or the password is not correct!");
                                     currentUser = null;
                                 }
+                                printDiv();
                                 continue;
                             case 2:
                                 String[] credentials32 = menu.displayRegistrationMenu();
@@ -217,19 +225,20 @@ public class HotelManagementSystem {
                                     System.out.println("A user with this name is already registered!");
                                     currentUser = null;
                                 }
+                                printDiv();
                                 continue;
                             case 3:
                                 int ch31 = menu.displayAdminMenu();
-                                printDiv();
                                 adminOperations(ch31, this.menu, this.bookings, this.rooms, this.totalIncome, this.totalCancellationFees, this.roomTypes);
+                                printDiv();
                                 continue;
                             case 4:
                                 continue;
                         }
                     }
+                    printDiv();
                     break;
                 case 4:
-                    // printDiv();
                     if (currentUser == null) {
                         int ch4 = menu.displayEntranceMenu();
                         printDiv();
@@ -245,6 +254,7 @@ public class HotelManagementSystem {
                                     System.out.println("A user with this name is not registered or the password is not correct!");
                                     currentUser = null;
                                 }
+                                printDiv();
                                 continue;
                             case 2:
                                 String[] credentials2 = menu.displayRegistrationMenu();
@@ -256,11 +266,12 @@ public class HotelManagementSystem {
                                     System.out.println("A user with this name is already registered!");
                                     currentUser = null;
                                 }
+                                printDiv();
                                 continue;
                             case 3:
                                 int ch31 = menu.displayAdminMenu();
-                                printDiv();
                                 adminOperations(ch31, this.menu, this.bookings, this.rooms, this.totalIncome, this.totalCancellationFees, this.roomTypes);
+                                printDiv();
                                 continue;
                             case 4:
                                 continue;
@@ -268,22 +279,23 @@ public class HotelManagementSystem {
                     } else {
                         currentUser.viewProfile();
                     }
+                    printDiv();
                     break;
                 case 5:
-                    // printDiv();
                     if (currentUser != null) {
                         currentUser = null;
                     } else {
                         System.out.println("You are not logged in the system!");
                     }
+                    printDiv();
                     break;
                 case 6:
-                    // printDiv();
                     if (currentUser != null) {
                         System.out.printf("Bye, %s!%n", currentUser.getUsername());
                     } else {
                         System.out.println("Goodbye!");
                     }
+                    printDiv();
                     menu.close();
                     return;
             }
@@ -389,8 +401,8 @@ public class HotelManagementSystem {
 
     public static boolean checkRoomExistence(List<Room> rms, String rmNum) {
         if (!rms.isEmpty()) {
-            for (int i = 0; i < rms.size(); i++) {
-                if (rms.get(i).getRoomNumber().equals(rmNum)) {
+            for (Room rm : rms) {
+                if (rm.getRoomNumber().equals(rmNum)) {
                     return true;
                 }
             }
@@ -415,7 +427,7 @@ public class HotelManagementSystem {
         }
     }
 
-    public static boolean dateCheck(int year, int month, int day) {
+    public static boolean dateCheck(int month, int day) {
         if (month < 1 || month > 12) {
             return false;
         }
@@ -515,43 +527,46 @@ public class HotelManagementSystem {
                         roomExists = true;
                         do {
                             boolean isExit = false;
+                            InputValidator validator = new InputValidator();
                             String input = men.getUserInput("Enter your choice: ");
-                            switch (men.getIntInput()) {
-                                case 1 -> {
+                            switch (Integer.parseInt(input)) {
+                                case 1:
                                     String newRoomNum = men.getUserInput("Enter the new number of the room: ");
-                                    while ((new InputValidator()).isValidRoomNumber(newRoomNum)) {
+                                    while (!validator.isValidRoomNumber(newRoomNum)) {
                                         newRoomNum = men.getUserInput("Invalid input! Enter a valid new number of the room: ");
                                     }
                                     rm.setRoomNumber(newRoomNum);
                                     writeModifiedRooms(rms);
-                                }
-                                case 2 -> {
+                                    break;
+                                case 2:
                                     String newRoomType = men.getUserInput("Enter the new type of the room: ");
-                                    while ((new InputValidator()).isValidType(roomTypeList, newRoomType)) {
+                                    while (!validator.isValidType(roomTypeList, newRoomType)) {
                                         newRoomType = men.getUserInput("Invalid input! Enter a valid new type of the room: ");
                                     }
                                     rm.setType(newRoomType);
                                     writeModifiedRooms(rms);
-                                }
-                                case 3 -> {
+                                    break;
+                                case 3:
                                     String newRoomPrice = men.getUserInput("Enter the new price of the room: ");
                                     rm.setPricePerNight(Double.parseDouble(newRoomPrice));
                                     writeModifiedRooms(rms);
-                                }
-                                case 4 -> {
+                                    break;
+                                case 4:
                                     String newRoomFee = men.getUserInput("Enter the new cancellation fee of the room: ");
                                     rm.setCancellationFee(Double.parseDouble(newRoomFee));
                                     writeModifiedRooms(rms);
-                                }
-                                case 5 -> {
+                                    break;
+                                case 5:
                                     String newRoomStatus = men.getUserInput("Enter the new status of the room: ");
-                                    while ((new InputValidator()).isValidStatus(newRoomStatus)) {
+                                    while (!validator.isValidStatus(newRoomStatus)) {
                                         newRoomStatus = men.getUserInput("Invalid input! Enter a valid new status of the room: ");
                                     }
                                     rm.setStatus(newRoomStatus);
                                     writeModifiedRooms(rms);
-                                }
-                                case 6 -> isExit = true;
+                                    break;
+                                case 6:
+                                    isExit = true;
+                                    break;
                             }
 
                             if (isExit) {

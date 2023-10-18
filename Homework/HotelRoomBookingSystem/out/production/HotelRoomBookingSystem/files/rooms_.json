@@ -396,7 +396,7 @@
     "type": "Deluxe",
     "pricePerNight": 150.0,
     "cancellationFee": 25.0,
-    "status": "booked"
+    "status": "available"
   },
   {
     "roomNumber": "2902",
@@ -413,7 +413,7 @@
     "status": "available"
   },
   {
-    "roomNumber": "3002",
+    "roomNumber": "3003",
     "type": "Suite",
     "pricePerNight": 250.0,
     "cancellationFee": 30.0,
