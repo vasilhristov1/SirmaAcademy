@@ -44,14 +44,11 @@ public class Menu {
         return this.getIntInput();
     }
 
-    public String[] displayBookingMenu() {
+    public String[] displayBookingMenu(List<RoomType> roomTypeList) {
         InputValidator inputValidator = new InputValidator();
         String[] tokens = new String[3];
 
         System.out.println("Booking Menu");
-        System.out.println("Which room would you like to book?");
-        String roomNumber = scan.nextLine();
-
         System.out.println("Enter your check in date: ");
         String checkInDate = scan.nextLine();
         while (!inputValidator.isValidDate(checkInDate)) {
@@ -66,7 +63,14 @@ public class Menu {
             checkOutDate = scan.nextLine();
         }
 
-        tokens[0] = roomNumber;
+        System.out.println("Enter the type of the room you want to stay in: ");
+        String roomType = scan.nextLine();
+        while (!inputValidator.isValidType(roomTypeList, roomType)) {
+            System.out.println("Please, enter a valid room type: ");
+            roomType = scan.nextLine();
+        }
+
+        tokens[0] = roomType;
         tokens[1] = checkInDate;
         tokens[2] = checkOutDate;
 

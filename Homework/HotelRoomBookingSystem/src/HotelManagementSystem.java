@@ -50,16 +50,11 @@ public class HotelManagementSystem {
                     printDiv();
                     if (currentUser != null) {
                         InputValidator validator = new InputValidator();
-                        String[] bookingValues = menu.displayBookingMenu();
-                        String roomNumber = bookingValues[0];
-                        if (!validator.isValidRoomNumber(roomNumber) && !checkRoomExistence(this.rooms, roomNumber)) {
-                            System.out.println("The room number is not valid or there is no such a room!");
-                            printDiv();
-                            continue;
-                        }
+                        String[] bookingValues = menu.displayBookingMenu(this.roomTypes);
 
                         String[] checkIn = bookingValues[1].split("-");
                         String[] checkOut = bookingValues[2].split("-");
+                        String roomType = bookingValues[0];
 
                         int yearIn = Integer.parseInt(checkIn[0]);
                         int monthIn = Integer.parseInt(checkIn[1]);
@@ -87,6 +82,15 @@ public class HotelManagementSystem {
 
                         Date start = new Date(yearIn, monthIn - 1, dayIn);
                         Date end = new Date(yearOut, monthOut - 1, dayOut);
+
+                        System.out.println("There are all available rooms:");
+                        for (int i = 0; i < this.rooms.size(); i++) {
+                            if (this.rooms.get(i).getType().equals(roomType) && this.rooms.get(i).getStatus().equals("available")) {
+                                System.out.printf("%s %s room - $%.2f per night%n", this.rooms.get(i).getRoomNumber(), this.rooms.get(i).getType(), this.rooms.get(i).getPricePerNight());
+                            }
+                        }
+
+                        String roomNumber = menu.getUserInput("Enter the number of the desired room: ");
 
                         Room roomToBook = checkAvailability(rooms, roomNumber, start, end, bookings);
 
