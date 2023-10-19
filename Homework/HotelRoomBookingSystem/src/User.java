@@ -48,6 +48,26 @@ public class User {
         this.sum -= sum;
     }
 
+    public void setBookings(List<Booking> bookings) {
+        this.bookings = bookings;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public void setFees(double fees) {
+        this.fees = fees;
+    }
+
+    public void setSum(double sum) {
+        this.sum = sum;
+    }
+
     public void addBooking(Booking booking) {
         this.bookings.add(booking);
     }
@@ -62,5 +82,14 @@ public class User {
             System.out.println(i + ". " + booking);
             i++;
         }
+    }
+
+    @Override
+    public String toString() {
+        return "Username: " + username +
+                ", \nPassword: " + password +
+                ", \nBookings: " + bookings +
+                ", \nFees: " + fees +
+                ", \nSum: " + sum;
     }
 }

@@ -1,0 +1,16 @@
+Username: Vasko009
+Password: Vasko123
+Fees: 0.0
+Sum: 750.0
+Bookings:
+ID: 13213. 
+Room - 2901, 
+User - Vasko009, 
+Check In - 2023-10-10,
+Check Out - 2023-10-15
+
+Username: Nikol99
+Password: Nikol123
+Fees: 0.0
+Sum: 0.0
+Bookings:

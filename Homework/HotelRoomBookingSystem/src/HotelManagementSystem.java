@@ -3,13 +3,16 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonIOException;
 import com.google.gson.reflect.TypeToken;
 
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Type;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class HotelManagementSystem {
     public List<RoomType> roomTypes;
@@ -83,7 +86,7 @@ public class HotelManagementSystem {
                         Date start = new Date(yearIn, monthIn - 1, dayIn);
                         Date end = new Date(yearOut, monthOut - 1, dayOut);
 
-                        System.out.println("There are all available rooms:");
+                        System.out.println("Here is a list of all available rooms:");
                         for (int i = 0; i < this.rooms.size(); i++) {
                             if (this.rooms.get(i).getType().equals(roomType) && this.rooms.get(i).getStatus().equals("available")) {
                                 System.out.printf("%s %s room - $%.2f per night%n", this.rooms.get(i).getRoomNumber(), this.rooms.get(i).getType(), this.rooms.get(i).getPricePerNight());
@@ -103,6 +106,7 @@ public class HotelManagementSystem {
                             this.bookings.add(booking);
                             this.rooms = changeStatusTo(this.rooms, roomToBook, "booked");
                             writeModifiedRooms(this.rooms);
+                            writeIncomeReportToFile(this.totalIncome, this.totalCancellationFees);
                             System.out.printf("Room number %s is successfully booked!%n", roomNumber);
                         } else {
                             System.out.println("The chosen room is not available!");
@@ -127,6 +131,7 @@ public class HotelManagementSystem {
                                 if (containsUser(users, credentials22[0], credentials22[1]) == null) {
                                     currentUser = new User(credentials22[0], credentials22[1]);
                                     users.add(currentUser);
+                                    // writeUsersToFile(this.users);
                                 } else {
                                     System.out.println("A user with this name is already registered!");
                                     currentUser = null;
@@ -196,6 +201,7 @@ public class HotelManagementSystem {
                                     }
 
                                     this.totalCancellationFees += userCancellationFee;
+                                    writeIncomeReportToFile(this.totalIncome, this.totalCancellationFees);
 
                                     System.out.printf("Booking %d is successfully cancelled!%n", ch3);
                                 } else {
@@ -225,6 +231,7 @@ public class HotelManagementSystem {
                                 if (containsUser(users, credentials32[0], credentials32[1]) == null) {
                                     currentUser = new User(credentials32[0], credentials32[1]);
                                     users.add(currentUser);
+                                    // writeUsersToFile(this.users);
                                 } else {
                                     System.out.println("A user with this name is already registered!");
                                     currentUser = null;
@@ -265,6 +272,7 @@ public class HotelManagementSystem {
                                 if (containsUser(users, credentials2[0], credentials2[1]) == null) {
                                     currentUser = new User(credentials2[0], credentials2[1]);
                                     users.add(currentUser);
+                                    // writeUsersToFile(this.users);
                                     currentUser.viewProfile();
                                 } else {
                                     System.out.println("A user with this name is already registered!");
@@ -300,6 +308,7 @@ public class HotelManagementSystem {
                         System.out.println("Goodbye!");
                     }
                     printDiv();
+                    // writeUserListToFile(this.users);
                     menu.close();
                     return;
             }
@@ -323,7 +332,12 @@ public class HotelManagementSystem {
             e.printStackTrace();
         }
 
+        double[] incomeValues = readIncomeReportFromFile();
+        this.totalIncome = incomeValues[0];
+        this.totalCancellationFees = incomeValues[1];
+
         this.users = new ArrayList<>();
+        // this.users = readUserReportFromFile();
         this.bookings = new ArrayList<>();
         this.menu = new Menu();
         this.currentUser = null;
@@ -384,7 +398,7 @@ public class HotelManagementSystem {
 
     public static void writeModifiedRooms(List<Room> rooms_) {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        String filePath = "D:\\Study\\SirmaAcademy\\Homework\\HotelRoomBookingSystem\\src\\files\\rooms_.json";
+        String filePath = "D:\\Study\\SirmaAcademy\\Homework\\HotelRoomBookingSystem\\src\\files\\rooms.json";
 
         try (FileWriter writer = new FileWriter(filePath)) {
             gson.toJson(rooms_, writer);
@@ -466,6 +480,175 @@ public class HotelManagementSystem {
         return true;
     }
 
+    public static void writeIncomeReportToFile(double totalIncome, double totalCancellationFee) {
+        String filePath = "D:\\Study\\SirmaAcademy\\Homework\\HotelRoomBookingSystem\\src\\files\\income_report.txt";
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+            writer.write(printReport(totalIncome, totalCancellationFee));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static double[] readIncomeReportFromFile() {
+        String filePath = "D:\\Study\\SirmaAcademy\\Homework\\HotelRoomBookingSystem\\src\\files\\income_report.txt";
+        double totalIncome = 0.0;
+        double totalCancellationFee = 0.0;
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.startsWith("Total income:")) {
+                    totalIncome = Double.parseDouble(line.split(":")[1].trim());
+                } else if (line.startsWith("Total cancellation fees:")) {
+                    totalCancellationFee = Double.parseDouble(line.split(":")[1].trim());
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return new double[]{totalIncome, totalCancellationFee};
+    }
+
+    public static String printReport(double ti, double tcf) {
+        String result = "";
+
+        result += "Income Report\n";
+        result += String.format("Total income: %.2f%n", ti);
+        result += String.format("Total cancellation fees: %.2f%n", tcf);
+        result += String.format("Total: %.2f%n", (ti + tcf));
+
+        return result;
+    }
+
+//    public static void writeUserListToFile(List<User> users) {
+//        String filePath = "D:\\Study\\SirmaAcademy\\Homework\\HotelRoomBookingSystem\\src\\files\\users.txt";
+//        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+//            writer.write(printUserList(users));
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
+//
+//    public static List<User> readUserReportFromFile() {
+//        List<User> users = new ArrayList<>();
+//        String filePath = "D:\\Study\\SirmaAcademy\\Homework\\HotelRoomBookingSystem\\src\\files\\users.txt";
+//        boolean isTrue = false;
+//        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+//            String line;
+//            User user = null;
+//            while ((line = reader.readLine()) != null) {
+//                if (line.startsWith("Username: ")) {
+//                    if (user != null) {
+//                        users.add(user);
+//                    }
+//                    user = createUserFromLine(line);
+//                } else if (line.startsWith("Password: ")) {
+//                    user.setPassword(line.replace("Password: ", ""));
+//                } else if (line.startsWith("Fees: ")) {
+//                    user.setFees(Double.parseDouble(line.replace("Fees: ", "")));
+//                } else if (line.startsWith("Sum: ")) {
+//                    user.setSum(Double.parseDouble(line.replace("Sum: ", "")));
+//                } else if (line.equals("Bookings:")) {
+//                    List<Booking> bookings = new ArrayList<>();
+//                    while (reader.readLine() != null) {
+//                        bookings.add(createBookingFromLine(line));
+//                    }
+//                    user.setBookings(bookings);
+//                }
+//            }
+//            if (user != null) {
+//                users.add(user);
+//            }
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+//        return users;
+//    }
+//
+//    private static User createUserFromLine(String line) {
+//        String username = line.replace("Username: ", "").trim();
+//        return new User(username, "defaultPassword");
+//    }
+//
+//    private static Booking createBookingFromLine(String line) {
+//        String[] parts = line.split("\n");
+//        int bookingID = -1;
+//        String roomNumber = null;
+//        String username = null;
+//        Date checkIn = null;
+//        Date checkOut = null;
+//
+//        for (String part : parts) {
+//            String[] keyValue = part.split(" - ");
+//            if (keyValue.length == 2) {
+//                String key = keyValue[0].trim();
+//                String value = keyValue[1].trim();
+//
+//                switch (key) {
+//                    case "ID":
+//                        bookingID = Integer.parseInt(value);
+//                        break;
+//                    case "Room":
+//                        roomNumber = value;
+//                        break;
+//                    case "User":
+//                        username = value;
+//                        break;
+//                    case "Check In":
+//                        try {
+//                            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+//                            checkIn = dateFormat.parse(value);
+//                        } catch (ParseException e) {
+//                            e.printStackTrace();
+//                        }
+//                        break;
+//                    case "Check Out":
+//                        try {
+//                            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+//                            checkOut = dateFormat.parse(value);
+//                        } catch (ParseException e) {
+//                            e.printStackTrace();
+//                        }
+//                        break;
+//                }
+//            }
+//        }
+//
+//        return new Booking(bookingID, roomNumber, new User(username, ""), checkIn, checkOut);
+//    }
+//
+//
+//    public static String printUserList(List<User> users) {
+//        StringBuilder result = new StringBuilder();
+//
+//        for (User user : users) {
+//            result.append("Username: ").append(user.getUsername()).append("\n");
+//            result.append("Password: ").append(user.getPassword()).append("\n");
+//            result.append("Fees: ").append(user.getFees()).append("\n");
+//            result.append("Sum: ").append(user.getSum()).append("\n");
+//            result.append("Bookings:").append("\n");
+//
+//            for (Booking booking : user.getBookings()) {
+//                result.append(booking.toString()).append("\n");
+//            }
+//            result.append("\n");
+//        }
+//
+//        return result.toString();
+//    }
+//
+//    public static String printBookingsList(List<Booking> bookingList) {
+//        String result = "";
+//
+//        for (int i = 0; i < bookingList.size(); i++) {
+//            result += bookingList.get(i);
+//            result += "\n\n";
+//        }
+//
+//        return result;
+//    }
+
     public static void adminOperations(int choice, Menu men, List<Booking> books, List<Room> rms, double ti, double tcf, List<RoomType> roomTypeList) {
         switch (choice) {
             case 1:
@@ -480,10 +663,7 @@ public class HotelManagementSystem {
                 }
                 break;
             case 2:
-                System.out.println("Income Report");
-                System.out.printf("Total income: %.2f%n", ti);
-                System.out.printf("Total cancellation fees: %.2f%n", tcf);
-                System.out.printf("Total: %.2f%n", (ti + tcf));
+                System.out.print(printReport(ti, tcf));
                 break;
             case 3:
                 String[] roomDetails = men.displayAddRoomMenu(roomTypeList);

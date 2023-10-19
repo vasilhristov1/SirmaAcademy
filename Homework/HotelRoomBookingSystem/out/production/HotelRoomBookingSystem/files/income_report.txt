@@ -1,0 +1,4 @@
+Income Report
+Total income: 0.00
+Total cancellation fees: 0.00
+Total: 0.00

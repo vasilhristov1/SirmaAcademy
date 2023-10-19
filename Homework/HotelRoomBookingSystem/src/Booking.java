@@ -9,6 +9,13 @@ public class Booking {
     private Date checkOut;
     Random random = new Random();
 
+    public Booking(int bookingID, String roomNumber, User user, Date checkIn, Date checkOut) {
+        this.bookingID = bookingID;
+        this.roomNumber = roomNumber;
+        this.user = user;
+        this.checkIn = checkIn;
+        this.checkOut = checkOut;
+    }
 
     public Booking(String roomNumber, User user, Date checkIn, Date checkOut) {
         this.bookingID = random.nextInt(0, 100000);
