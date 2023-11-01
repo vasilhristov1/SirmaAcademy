@@ -2,50 +2,54 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class InventoryManagementSystem {
     private static List<InventoryItem> inventory;
     private static Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
-        loadInventoryData();
+        System.out.println(expirationDateChecker("30-04-2022"));
 
-        boolean exit = false;
-
-        while (!exit) {
-            System.out.println("Inventory Management System");
-            System.out.println("1. Add Item");
-            System.out.println("2. List Items");
-            System.out.println("3. Categorize Items");
-            System.out.println("4. Place Order");
-            System.out.println("5. Exit");
-            System.out.print("Select an option: ");
-
-            int choice = scanner.nextInt();
-
-            switch (choice) {
-                case 1:
-                    addItem();
-                    break;
-                case 2:
-                    listItems();
-                    break;
-                case 3:
-                    categorizeItems();
-                    break;
-                case 4:
-                    placeOrder();
-                    break;
-                case 5:
-                    exit = true;
-                    break;
-                default:
-                    System.out.println("Invalid option. Please select a valid option.");
-            }
-        }
-        
-        saveInventoryData();
-        scanner.close();
+//        loadInventoryData();
+//
+//        boolean exit = false;
+//
+//        while (!exit) {
+//            System.out.println("Inventory Management System");
+//            System.out.println("1. Add Item");
+//            System.out.println("2. List Items");
+//            System.out.println("3. Categorize Items");
+//            System.out.println("4. Place Order");
+//            System.out.println("5. Exit");
+//            System.out.print("Select an option: ");
+//
+//            int choice = scanner.nextInt();
+//
+//            switch (choice) {
+//                case 1:
+//                    addItem();
+//                    break;
+//                case 2:
+//                    listItems();
+//                    break;
+//                case 3:
+//                    categorizeItems();
+//                    break;
+//                case 4:
+//                    placeOrder();
+//                    break;
+//                case 5:
+//                    exit = true;
+//                    break;
+//                default:
+//                    System.out.println("Invalid option. Please select a valid option.");
+//            }
+//        }
+//
+//        saveInventoryData();
+//        scanner.close();
     }
 
     private static void loadInventoryData() {
@@ -58,6 +62,76 @@ public class InventoryManagementSystem {
         textFileWriter.saveInventoryToFile(inventory, "D:\\Study\\SirmaAcademy\\Homework\\InventoryManagementSystem\\src\\Files\\items.txt");
     }
 
+    public static boolean categoryCheck(String category) {
+        if (category.equals("Electronic") || category.equals("Grocery") || category.equals("Fragile")) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public static boolean isLeapYear(int year) {
+        if ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public static boolean expirationDateChecker(String date) {
+        Pattern pattern = Pattern.compile("\\d{2}-\\d{2}-\\d{4}");
+        Matcher matcher = pattern.matcher(date);
+
+        if (matcher.find()) {
+            String[] parts = date.split("-");
+            int day = Integer.parseInt(parts[0]);
+            int month = Integer.parseInt(parts[1]);
+            int year = Integer.parseInt(parts[2]);
+
+            switch (month) {
+                case 1:
+                case 3:
+                case 5:
+                case 7:
+                case 8:
+                case 10:
+                case 12:
+                    if (day > 31 || day < 1) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                case 2:
+                    if (isLeapYear(year)) {
+                        if (day > 29 || day < 1) {
+                            return false;
+                        } else {
+                            return true;
+                        }
+                    } else {
+                        if (day > 28 || day < 1) {
+                            return false;
+                        } else {
+                            return true;
+                        }
+                    }
+                case 4:
+                case 6:
+                case 9:
+                case 11:
+                    if (day > 30 || day < 1) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                default:
+                    return false;
+            }
+        }
+
+        return false;
+    }
+
     private static void addItem() {
         System.out.println("Add a New Item");
         System.out.print("Enter the name of the item: ");
@@ -65,6 +139,10 @@ public class InventoryManagementSystem {
 
         System.out.print("Enter the category of the item: ");
         String category = scanner.nextLine();
+        while (!categoryCheck(category)) {
+            System.out.println("Invalid category. Please enter category again: ");
+            category = scanner.nextLine();
+        }
 
         System.out.print("Enter the price of the item: ");
         double price = Double.parseDouble(scanner.nextLine());
@@ -73,17 +151,41 @@ public class InventoryManagementSystem {
         int quantity = Integer.parseInt(scanner.nextLine());
 
         if ("Grocery".equalsIgnoreCase(category)) {
-            System.out.print("Enter the expiration date (e.g., 2023-12-31): ");
+            System.out.print("Enter the expiration date (e.g., 31-12-2023): ");
             String expirationDate = scanner.nextLine();
 
             GroceryItem newItem = new GroceryItem(name, price, quantity, expirationDate);
-            inventory.add(newItem);
+            boolean isNew = false;
+
+            for (int i = 0; i < inventory.size(); i++) {
+                if (inventory.get(i) == newItem) {
+                    inventory.get(i).setQuantity(inventory.get(i).getQuantity() + newItem.getQuantity());
+                } else {
+                    isNew = true;
+                }
+            }
+
+            if (isNew) {
+                inventory.add(newItem);
+            }
         } else if ("Fragile".equalsIgnoreCase(category)) {
             System.out.print("Enter the weight (in kilograms) of the item: ");
             double weight = scanner.nextDouble();
 
             FragileItem newItem = new FragileItem(name, price, quantity, weight);
-            inventory.add(newItem);
+            boolean isNew = false;
+
+            for (int i = 0; i < inventory.size(); i++) {
+                if (inventory.get(i) == newItem) {
+                    inventory.get(i).setQuantity(inventory.get(i).getQuantity() + newItem.getQuantity());
+                } else {
+                    isNew = true;
+                }
+            }
+
+            if (isNew) {
+                inventory.add(newItem);
+            }
         } else if ("Electronic".equalsIgnoreCase(category)) {
             ElectronicsItem newItem = new ElectronicsItem(name, price, quantity);
             inventory.add(newItem);
