@@ -4,7 +4,7 @@ public class FragileItem extends InventoryItem {
     @JsonProperty("weight")
     private double weight;
 
-    public FragileItem(String name, double price, int quantity, double weight) {
+    public FragileItem(String name, double price, int quantity, String details, double weight) {
         super(quantity);
         setName(name);
         setCategory("Fragile");
@@ -12,6 +12,7 @@ public class FragileItem extends InventoryItem {
         setWeight(weight);
         setPerishable(isPerishable());
         setBreakable(isBreakable());
+        setDetails(details);
     }
 
     @Override
@@ -50,6 +51,6 @@ public class FragileItem extends InventoryItem {
     public String toString() {
         return getItemID() + "," + getCategory() + "," +
                 getName() + "," + getPrice() + "," +
-                getQuantity() + "," + getWeight();
+                getQuantity() + "," + getDetails() + "," + getWeight();
     }
 }

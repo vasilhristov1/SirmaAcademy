@@ -1,22 +1,13 @@
 import Interfaces.*;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.io.Serializable;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
 public abstract class AbstractItem implements Item, Categorizable, Breakable, Perishable, Sellable, Serializable {
-    @JsonProperty("name")
     private String name;
-    @JsonProperty("category")
     private String category;
-    @JsonProperty("perishable")
     private boolean perishable;
-    @JsonProperty("breakable")
     private boolean breakable;
-    @JsonProperty("price")
     private double price;
-    @JsonProperty("details")
     private String details;
 
     @Override

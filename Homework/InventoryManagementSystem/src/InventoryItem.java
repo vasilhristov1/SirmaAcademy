@@ -1,13 +1,8 @@
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.io.Serializable;
 
-public class InventoryItem extends AbstractItem implements Serializable {
+public abstract class InventoryItem extends AbstractItem implements Serializable, Comparable<InventoryItem> {
     public static int id = 1;
-    @JsonProperty("id")
     private int itemID;
-    @JsonProperty("quantity")
     private int quantity;
 
     public InventoryItem(int quantity) {
@@ -20,7 +15,6 @@ public class InventoryItem extends AbstractItem implements Serializable {
         return (this.getPrice() * this.getQuantity());
     }
 
-    @JsonIgnore
     @Override
     public String getDescription() {
         return null;
@@ -40,5 +34,18 @@ public class InventoryItem extends AbstractItem implements Serializable {
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
+    }
+
+    @Override
+    public int compareTo(InventoryItem o) {
+        if (this.getName().compareTo(o.getName()) == 0 &&
+                this.getCategory().compareTo(o.getCategory()) == 0 &&
+                this.getPrice() == o.getPrice() &&
+                this.getDetails().compareTo(o.getDetails()) == 0
+        ) {
+            return 0;
+        }
+
+        return -1;
     }
 }

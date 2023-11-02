@@ -1,6 +1,6 @@
-1,Electronic,Smartphone,999.99,2
-2,Electronic,Laptop,500.99,5
-3,Fragile,Glass,3.29,6,0.33
-4,Fragile,Vase,100.0,1,5.63
-5,Grocery,Tomato,0.99,5,10-10-2024
-6,Grocery,Cucumber,0.59,3,12-12-2024
+1,Electronic,Smartphone,999.99,2,Apple iPhone 15 Pro
+2,Electronic,MacBook,1999.99,1,MacBook Pro
+3,Grocery,Tomato,0.99,5,Red tomatoes,10-10-2023
+4,Grocery,Cucumber,1.99,2,Cucumber for tarator,11-10-2023
+5,Fragile,Vase,89.99,1,Chinese vase,5.0
+6,Grocery,Tomato,0.99,8,Red tomatoes,10-10-2023

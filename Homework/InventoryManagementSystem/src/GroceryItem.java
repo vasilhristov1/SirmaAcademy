@@ -4,7 +4,7 @@ public class GroceryItem extends InventoryItem {
     @JsonProperty("expirationDate")
     private String expirationDate;
 
-    public GroceryItem(String name, double price, int quantity, String expirationDate) {
+    public GroceryItem(String name, double price, int quantity, String details, String expirationDate) {
         super(quantity);
         this.setName(name);
         this.setCategory("Grocery");
@@ -12,6 +12,7 @@ public class GroceryItem extends InventoryItem {
         setPerishable(isPerishable());
         setBreakable(isBreakable());
         this.setExpirationDate(expirationDate);
+        setDetails(details);
     }
 
     public String getExpirationDate() {
@@ -26,6 +27,6 @@ public class GroceryItem extends InventoryItem {
     public String toString() {
         return getItemID() + "," + getCategory() + "," +
                 getName() + "," + getPrice() + "," +
-                getQuantity() + "," + getExpirationDate();
+                getQuantity() + "," + getDetails() + "," + getExpirationDate();
     }
 }
