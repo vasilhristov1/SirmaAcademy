@@ -282,36 +282,33 @@ public class InventoryManagementSystem {
     }
 
     private static void listItems() {
+        System.out.println("List of all items");
         for (InventoryItem item : inventory) {
             System.out.println(item);
         }
     }
 
     private static void categorizeItems() {
+        Scanner scan = new Scanner(System.in);
+        boolean haveOne = false;
+        System.out.println("Categorize Items");
+        System.out.print("Enter a category of items to be shown: ");
+        String category = scan.nextLine();
 
+        System.out.printf("All %s items%n", category);
+        for (int i = 0; i < inventory.size(); i++) {
+            if (inventory.get(i).getCategory().equals(category)) {
+                haveOne = true;
+                System.out.println(inventory.get(i));
+            }
+        }
+
+        if (!haveOne) {
+            System.out.println("There are no products of this category.");
+        }
     }
 
     private static void placeOrder() {
 
     }
-
-//    public static void main(String[] args) {
-//        List<InventoryItem> items = new ArrayList<>();
-//        items.add(new ElectronicsItem("Smartphone", 999.99, 2));
-//        items.add(new ElectronicsItem("Laptop", 500.99, 5));
-//        items.add(new FragileItem("Glass", 3.29, 6, 0.33));
-//        items.add(new FragileItem("Vase", 100.0, 1, 5.63));
-//        items.add(new GroceryItem("Tomato", 0.99, 5, "10-10-2024"));
-//        items.add(new GroceryItem("Cucumber", 0.59, 3, "12-12-2024"));
-//
-//        TextFileWriter textFileWriter = new TextFileWriter();
-//        textFileWriter.saveInventoryToFile(items, "D:\\Study\\SirmaAcademy\\Homework\\InventoryManagementSystem\\src\\Files\\items.txt");
-//        TextFileReader textFileReader = new TextFileReader();
-//
-//        List<InventoryItem> items_test = textFileReader.loadInventoryFromFile("D:\\Study\\SirmaAcademy\\Homework\\InventoryManagementSystem\\src\\Files\\items.txt");
-//
-//        for (Serializable item : items_test) {
-//            System.out.println(item);
-//        }
-//    }
 }

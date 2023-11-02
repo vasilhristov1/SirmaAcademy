@@ -38,14 +38,6 @@ public abstract class InventoryItem extends AbstractItem implements Serializable
 
     @Override
     public int compareTo(InventoryItem o) {
-        if (this.getName().compareTo(o.getName()) == 0 &&
-                this.getCategory().compareTo(o.getCategory()) == 0 &&
-                this.getPrice() == o.getPrice() &&
-                this.getDetails().compareTo(o.getDetails()) == 0
-        ) {
-            return 0;
-        }
-
-        return -1;
+        return getCategory().compareTo(o.getCategory());
     }
 }

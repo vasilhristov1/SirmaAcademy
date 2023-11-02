@@ -1,7 +1,4 @@
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 public class FragileItem extends InventoryItem {
-    @JsonProperty("weight")
     private double weight;
 
     public FragileItem(String name, double price, int quantity, String details, double weight) {

@@ -1,7 +1,4 @@
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 public class GroceryItem extends InventoryItem {
-    @JsonProperty("expirationDate")
     private String expirationDate;
 
     public GroceryItem(String name, double price, int quantity, String details, String expirationDate) {

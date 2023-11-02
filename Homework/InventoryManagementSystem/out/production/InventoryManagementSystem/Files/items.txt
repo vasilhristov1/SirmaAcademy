@@ -1,6 +1,7 @@
 1,Electronic,Smartphone,999.99,2,Apple iPhone 15 Pro
 2,Electronic,MacBook,1999.99,1,MacBook Pro
 3,Grocery,Tomato,0.99,5,Red tomatoes,10-10-2023
-4,Grocery,Cucumber,1.99,2,Cucumber for tarator,11-10-2023
 5,Fragile,Vase,89.99,1,Chinese vase,5.0
 6,Grocery,Tomato,0.99,8,Red tomatoes,10-10-2023
+7,Electronic,iPhone,1299.99,1,15 Pro Max
+8,Grocery,Cucumber,1.99,2,For cold soup,11-10-2023
