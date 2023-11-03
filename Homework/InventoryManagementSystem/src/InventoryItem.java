@@ -1,6 +1,6 @@
 import java.io.Serializable;
 
-public abstract class InventoryItem extends AbstractItem implements Serializable, Comparable<InventoryItem> {
+public class InventoryItem extends AbstractItem implements Serializable, Comparable<InventoryItem> {
     public static int id = 1;
     private int itemID;
     private int quantity;
