@@ -8,6 +8,7 @@ public class Order {
     private int orderId;
     private List<InventoryItem> items;
     private Map<InventoryItem, Integer> itemQuantities;
+    private Payment payment;
 
     // Constructor
     public Order() {
@@ -35,6 +36,14 @@ public class Order {
             items.add(item);
             itemQuantities.put(item, quantity);
         }
+    }
+
+    public void processPayment(double amount) {
+        this.payment = new Payment(amount);
+    }
+
+    public Payment getPayment() {
+        return payment;
     }
 
     // Calculate the total cost of the order
@@ -65,15 +74,16 @@ public class Order {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Order ID: ").append(orderId).append("\n");
-        sb.append("Items:\n");
-
-        for (InventoryItem item : items) {
-            sb.append(item.getName()).append(" (Quantity: ").append(itemQuantities.get(item)).append(")\n");
+        StringBuilder orderSummary = new StringBuilder("Order Summary:\n");
+        for (Map.Entry<InventoryItem, Integer> entry : itemQuantities.entrySet()) {
+            InventoryItem item = entry.getKey();
+            int quantity = entry.getValue();
+            orderSummary.append(item.getName()).append(" x").append(quantity).append(" - $").append(item.getPrice() * quantity).append("\n");
         }
-
-        sb.append("Total Cost: $").append(calculateTotalCost()).append("\n");
-        return sb.toString();
+        orderSummary.append("Total Cost: $").append(calculateTotalCost());
+        if (payment != null) {
+            orderSummary.append("\n").append(payment);
+        }
+        return orderSummary.toString();
     }
 }

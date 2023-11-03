@@ -158,7 +158,7 @@ public class InventoryManagementSystem {
         try {
             return Double.parseDouble(scanner.nextLine());
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Enter a valid floating number: ");
             return doubleInput();
         }
     }
@@ -168,7 +168,7 @@ public class InventoryManagementSystem {
         try {
             return Integer.parseInt(scanner.nextLine());
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Enter a valid integer: ");
             return integerInput();
         }
     }
@@ -277,7 +277,7 @@ public class InventoryManagementSystem {
         }
 
         if (!isFound) {
-            System.out.printf("An item with ID - %d is not found", id);
+            System.out.printf("An item with ID - %d is not found%n", id);
         }
     }
 
@@ -309,6 +309,81 @@ public class InventoryManagementSystem {
     }
 
     private static void placeOrder() {
+        Scanner scanner = new Scanner(System.in);
+        Order order = new Order();
 
+        boolean addingItems = true;
+        while (addingItems) {
+            System.out.println("Add items to the order:");
+            System.out.print("Enter the item ID: ");
+            int itemId = integerInput();
+
+            InventoryItem selectedItem = null;
+            for (InventoryItem item : inventory) {
+                if (item.getItemID() == itemId) {
+                    selectedItem = item;
+                    break;
+                }
+            }
+
+            if (selectedItem != null) {
+                System.out.print("Enter the quantity: ");
+                int quantity = integerInput();
+
+                if (quantity > 0 && quantity <= selectedItem.getQuantity()) {
+                    order.addItem(selectedItem, quantity);
+                    System.out.println("Item added to the order.");
+                    System.out.println("Do you want to add more items to the order? (yes/no): ");
+                    String continueAdding = scanner.next();
+                    if (!continueAdding.equalsIgnoreCase("yes")) {
+                        addingItems = false;
+                    }
+                } else {
+                    System.out.println("Invalid quantity. The item may not exist or there is insufficient quantity in stock.");
+                }
+            } else {
+                System.out.println("Item with ID " + itemId + " not found.");
+                System.out.println("Do you want to continue adding items to the order? (yes/no): ");
+                String continueAdding = scanner.next();
+                if (!continueAdding.equalsIgnoreCase("yes")) {
+                    addingItems = false;
+                }
+            }
+        }
+
+        if (order.getItems().isEmpty()) {
+            System.out.println("The order is empty, no items added.");
+        } else {
+            System.out.println("Order summary:");
+            System.out.println(order);
+
+            // Calculate the total cost and process the payment
+            double totalCost = order.calculateTotalCost();
+            System.out.println("Total cost of the order: $" + totalCost);
+            System.out.print("Enter the payment amount: $");
+            double paymentAmount = doubleInput();
+
+            if (paymentAmount >= totalCost) {
+                // Payment is sufficient
+                order.processPayment(paymentAmount);
+                double change = paymentAmount - totalCost;
+                System.out.println("Payment successful. Change: $" + change);
+
+                // Update the inventory quantities
+                for (InventoryItem item : order.getItemQuantities().keySet()) {
+                    int orderedQuantity = order.getItemQuantities().get(item);
+                    int remainingQuantity = item.getQuantity() - orderedQuantity;
+                    item.setQuantity(remainingQuantity);
+                }
+            } else {
+                System.out.println("Insufficient payment. Order not placed.");
+            }
+        }
+
+        // Add the order to a list of orders (if needed) and reset the order for the next one
+        // List<Order> orders = new ArrayList<>();
+        // orders.add(order);
+        order = new Order();
     }
+
 }
